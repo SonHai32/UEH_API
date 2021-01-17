@@ -16,7 +16,7 @@ class UEH_Crawl{
                 "cache-control": "max-age=0",
                 "content-type": "application/x-www-form-urlencoded",
                 "upgrade-insecure-requests": "1",
-                "cookie": "_ga=GA1.3.1645879011.1599398296; _fbp=fb.2.1599475167843.167287746; ASP.NET_SessionId=cz1lzj1j0hll55ykfhdivzz3",
+                 "cookie": "_ga=GA1.3.558671917.1606993663; _fbp=fb.2.1606993664855.1318858175; ASP.NET_SessionId=klx4fdtul3ja3ohyuvnov0pe"
             },
 
             referrerPolicy: 'strict-origin-when-cross-origin',
@@ -27,7 +27,7 @@ class UEH_Crawl{
     }
 
     requestServer(data = {
-        pathURI, formData: '', isTransform: false
+        formData: '', isTransform: false
     }){
         let form = {
             uri: API_SERVER,
@@ -40,14 +40,33 @@ class UEH_Crawl{
     }
 
 
+    fetchHiddenParam(){
+        return new Promise(async (reslove, reject) =>{
+            try{
+            
+                const $ = await this.requestServer({isTransform: true})
+                __VIEWSTATEGENERATOR = $('#__VIEWSTATEGENERATOR').val()
+                __EVENTVALIDATION = $('#__EVENTVALIDATION').val()
+                __VIEWSTATE = $('#__VIEWSTATE').val()
+
+
+                reslove('loaded')
+            }catch(err){
+                reject(err)
+            }
+        }) 
+    }
+
     login(){
         return new Promise(async (reslove, reject) =>{
             try{
                 const $ = await this.requestServer({
-                    pathURI: '/',
                     formData:{
                         __EVENTTARGET: '',
                         __EVENTARGUMENT: '',
+                        __VIEWSTATE,
+                        __VIEWSTATEGENERATOR,
+                        __EVENTVALIDATION,
                         ctl00$ContentPlaceHolder1$ctl00$ctl00$Role: 'rbtnStudent',
                         ctl00$ContentPlaceHolder1$ctl00$ctl00$txtUserName: '31201020315',
                         ctl00$ContentPlaceHolder1$ctl00$ctl00$txtPassword: '21967754',
@@ -58,9 +77,10 @@ class UEH_Crawl{
                 })
             
                 //if($('#lbtDangnhap').text() === 'Đăng Thoát') reject('Đăng Nhập Thất Bại');
-                __VIEWSTATE = $('#__VIEWSTATE').val()
+                console.log($('#lbtDangnhap').text())
                 __VIEWSTATEGENERATOR = $('#__VIEWSTATEGENERATOR').val()
                 __EVENTVALIDATION = $('#__EVENTVALIDATION').val()
+                __VIEWSTATE = $('#__VIEWSTATE').val()
                reslove(this.jar)
             }
             catch(err){
@@ -69,7 +89,7 @@ class UEH_Crawl{
         })
     }
 
-    getInfo(){
+    getStudentInfo(){
         return new Promise(async (reslove, reject) =>{
             try{
                 console.log(__VIEWSTATEGENERATOR)
@@ -86,16 +106,19 @@ class UEH_Crawl{
                     },
                     isTransform: true
                 })
-                const userTable = $('#Table3').children('tbody').children()
-                let user = {}
-                userTable.map(function(){
+    
+                let user = {
+                    id: $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_lbMaso').text(),
+                    name: $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_lbHoVaTen').text(),
+                    birthDate: $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_lbNgaysinh').text(),
+                    place: $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_lbNoiSinh').text(),
+                    gender: $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_blGioiTinh').text(),
+                    email: $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_lbEmailInfor').text(),
+                    emailUEH: $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_lbEmailInfo2').text(),
+                    avatar: API_SERVER + '/' + $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_imgStudents').attr('src')
+                }
 
-                    user[$(this).find('span.StudentInfoText_dl').text()]  = $(this).find('span.StudentInfoDetails_dl').text()
-                })
-                
-                console.log(user)
-                reslove("aa")
-
+                reslove(user)
             }catch(err){
                 reject(err)
             }
@@ -103,14 +126,62 @@ class UEH_Crawl{
         })
     }
     
+    getSchedule(){
+        return new Promise(async (reslove, reject) =>{
+            try{
+                
+
+                let listSchedule = [];
+                const $ = await this.requestServer({
+                    formData: {
+                        __EVENTTARGET: 'ctl00$ContentPlaceHolder1$ctl00$ctl00$lnkThoiKhoaBieu', 
+                        __EVENTARGUMENT: '',
+                        __VIEWSTATE,
+                        __VIEWSTATEGENERATOR,
+                        __EVENTVALIDATION
+                    },
+                    isTransform: true
+                })
+
+                let scheduleTable = $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_grvThoikhoabieu').children('tbody').children()
+                scheduleTable.map(function(){
+                    listSchedule.push({
+                        weekIndex: $(this).children()[0].find('span').text(),
+                        subjectName: $(this).find('td').text(),
+                        room: $(this).find('td').text(),
+                        startAt: $(this).find('td').text(),
+                        endAt: $(this).find('span').text(),
+                        date: $(this).find('#ContentPlaceHolder1_ctl00_ctl00_ctl00_grvThoikhoabieu_lblEndTime_0').text(),
+                        note: $(this).find('#ContentPlaceHolder1_ctl00_ctl00_ctl00_grvThoikhoabieu_lblFullName_0').text(),
+                    })
+                })
+                console.log(listSchedule)
+               /* const tableSchedule = $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_grvThoikhoabieu').childen('tbody').childen()
+                tableSchedule.map(function(){
+                    console.log($(this).text())
+                })*/
+                reslove('0k')
+            }catch(error){
+                reject(error)
+            }
+        })
+        
+
+    }
+    
 }
 
 const API = new UEH_Crawl(); 
 (async() =>{
     try{
-        await API.login()
-        let username = await API.getInfo()
-        console.log(username)
+        const login = await API.fetchHiddenParam()
+        const a = await API.login()
+        const user = await API.getStudentInfo()
+
+
+        console.log(user)
+       const c = await API.getSchedule(null)
+        console.log(c)
     
     }catch(err){
         console.log(err)
