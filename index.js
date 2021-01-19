@@ -145,15 +145,17 @@ class UEH_Crawl{
 
                 let scheduleTable = $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_grvThoikhoabieu').children('tbody').children()
                 scheduleTable.map(function(){
+
+                    const columns = $(this).children();
                     listSchedule.push({
-                        weekIndex: $(this).children()[0].find('span').text(),
-                        subjectName: $(this).find('td').text(),
-                        room: $(this).find('td').text(),
-                        startAt: $(this).find('td').text(),
-                        endAt: $(this).find('span').text(),
-                        date: $(this).find('#ContentPlaceHolder1_ctl00_ctl00_ctl00_grvThoikhoabieu_lblEndTime_0').text(),
-                        note: $(this).find('#ContentPlaceHolder1_ctl00_ctl00_ctl00_grvThoikhoabieu_lblFullName_0').text(),
-                    })
+                        weekIndex: $(columns[0]).find('span').text(),
+                        subjectName: $(columns[1]).find('span').text(),
+                        room: $(columns[2]).find('span').text(),
+                        startAt: $(columns[3]).find('span').text(),
+                        endAt: $(columns[4]).find('span').text(),
+                        date: $(columns[5]).find('span').text(),
+                        note: $(columns[6]).find('span').text(),
+                    }) 
                 })
                 console.log(listSchedule)
                /* const tableSchedule = $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_grvThoikhoabieu').childen('tbody').childen()
