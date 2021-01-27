@@ -1,4 +1,4 @@
-let cheerio = require('cheerio');
+const cheerio = require('cheerio');
 let request = require('request-promise');
 const API_SERVER = 'http://online.ueh.edu.vn';
 let __VIEWSTATE = '';
@@ -16,9 +16,8 @@ class UEH_Crawl{
                 "cache-control": "max-age=0",
                 "content-type": "application/x-www-form-urlencoded",
                 "upgrade-insecure-requests": "1",
-                 "cookie": "_ga=GA1.3.558671917.1606993663; _fbp=fb.2.1606993664855.1318858175; ASP.NET_SessionId=klx4fdtul3ja3ohyuvnov0pe"
+                "cookie": "_ga=GA1.3.558671917.1606993663; _fbp=fb.2.1606993664855.1318858175; ASP.NET_SessionId=klx4fdtul3ja3ohyuvnov0pe"
             },
-
             referrerPolicy: 'strict-origin-when-cross-origin',
             referrer: "http://online.ueh.edu.vn/",
             mode: "cors"
@@ -62,14 +61,14 @@ class UEH_Crawl{
             try{
                 const $ = await this.requestServer({
                     formData:{
-                        __EVENTTARGET: '',
+                        __EVENTTARGET: 'ctl00$lbtDangnhap',
                         __EVENTARGUMENT: '',
                         __VIEWSTATE,
                         __VIEWSTATEGENERATOR,
                         __EVENTVALIDATION,
                         ctl00$ContentPlaceHolder1$ctl00$ctl00$Role: 'rbtnStudent',
-                        ctl00$ContentPlaceHolder1$ctl00$ctl00$txtUserName: '31201020315',
-                        ctl00$ContentPlaceHolder1$ctl00$ctl00$txtPassword: '21967754',
+                        ctl00$ContentPlaceHolder1$ctl00$ctl00$txtUserName: '31201023216',
+                        ctl00$ContentPlaceHolder1$ctl00$ctl00$txtPassword: 'nganha123456',
                         ctl00$ContentPlaceHolder1$ctl00$ctl00$btLogin: 'Đăng nhập'
                     },
                     isTransform: true,
@@ -158,10 +157,7 @@ class UEH_Crawl{
                     }) 
                 })
                 console.log(listSchedule)
-               /* const tableSchedule = $('#ContentPlaceHolder1_ctl00_ctl00_ctl00_grvThoikhoabieu').childen('tbody').childen()
-                tableSchedule.map(function(){
-                    console.log($(this).text())
-                })*/
+               
                 reslove('0k')
             }catch(error){
                 reject(error)
