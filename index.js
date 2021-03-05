@@ -106,7 +106,12 @@ class UEH_API {
         .then((res) => {
           const $ = cheerio.load(res.data);
           this.setHidenParam(res.data)
-          reslove($("#lbtDangnhap").text());
+          if($("#lbtDangnhap").text().toString() === "Đăng Thoát"){
+            reslove("LOGIN OK")
+          }
+          else{
+            reject("LOGIN FAIL")
+          }
         })
         .catch((err) => reject(err));
     });
@@ -188,14 +193,14 @@ class UEH_API {
       })
       }
 
-  getAllData(){
+  getAllData({userID, userPassword}){
     return new Promise(async (reslove, reject) =>{
 
       try {
         const fetch = await this.fetchHiddenParam()   
         const login = await this.login({
-          userID: "31201020315",
-          userPassword: "21967754",
+          userID,
+          userPassword,
         })
         const userInfo = await this.getStudentInfo()
         const schedule = await this.getSchedule()
@@ -214,8 +219,4 @@ class UEH_API {
   }
 }
 
-(async () => {
-  const api = new UEH_API();
-  const data = await api.getAllData()
-  console.log(data);
-})();
+
